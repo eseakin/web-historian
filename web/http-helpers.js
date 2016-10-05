@@ -11,11 +11,22 @@ exports.headers = {
 };
 
 exports.serveAssets = function(res, asset, callback) {
-  // Write some code here that helps serve up your static files!
-  // (Static files are things like html (yours or archived from others...),
-  // css, or anything that doesn't change often.)
+  var thisPath = asset === '/' ? './web/public/index.html' : './web/public' + asset;
+  fs.readFile(thisPath, function(err, data) {
+    if (err) {
+      res.writeHead(404, exports.headers);
+      res.end('404 not found!!');
+    } else {
+      res.writeHead(200, exports.headers);
+      res.end(data);
+    }
+  });
 };
 
+
+exports.testyTest = function () {
+  console.log(archive.isUrlInList('www.example.com'));
+};
 
 
 // As you progress, keep thinking about what helper functions you can put here!
