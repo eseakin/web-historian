@@ -42,10 +42,8 @@ exports.isUrlInList = function(url) {
         result = true;
       }
     }
-    
-    return result;
-  });
 
+  });
 };
 
 exports.addUrlToList = function() {
