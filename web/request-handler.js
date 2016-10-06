@@ -10,7 +10,7 @@ exports.handleRequest = function (req, res) {
   var parsedUrl = url.parse(req.url);
 
   if (req.method === 'GET') {
-    helpers.testyTest();
+    //helpers.testyTest();
     helpers.serveAssets(res, parsedUrl.pathname);
 
   } else if (req.method === 'POST') {
@@ -21,14 +21,10 @@ exports.handleRequest = function (req, res) {
       body = body.join('').split('=')[1];
       console.log('server posting ', body);
 
-      if (archive.isUrlInList(body)) {
-        //send back website data
-      } else {
-        
-      }
-
-      res.writeHead(201, helpers.headers);
-      res.end(JSON.stringify(body));
+      archive.handlePost(body).then( url => {
+        res.writeHead(201, helpers.headers);
+        helpers.serveAssets(res, url);
+      });
     });
   }
 };

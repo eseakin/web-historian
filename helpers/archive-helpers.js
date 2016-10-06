@@ -25,7 +25,7 @@ exports.initialize = function(pathsObj) {
 // The following function names are provided to you to suggest how you might
 // modularize your code. Keep it clean!
 
-exports.readListOfUrls = function(cb) {
+exports.readListOfUrls = function() {
   return new Promise((resolve, reject) => {
     fs.readFile(exports.paths.list, function(err, data) {
       if (err) {
@@ -39,9 +39,8 @@ exports.readListOfUrls = function(cb) {
 };
 
 exports.isUrlInList = function(url) {
-  var result = false;
-
-  exports.readListOfUrls().then(list => {
+  return exports.readListOfUrls().then(list => {
+    var result = false;
     for (var i = 0; i < list.length; i++) {
       if (url === list[i]) {
         result = true;
@@ -52,16 +51,63 @@ exports.isUrlInList = function(url) {
   });
 };
 
-exports.addUrlToList = function(url) {
-  fs.appendFile(exports.paths.list, url, err => {
-    if (err) {
-      throw err;
+exports.handlePost = function(url) {
+  return exports.isUrlInList(url).then( isInList => {
+    if (isInList) {
+      return isUrlArchived(url);
+    } else {
+      return addUrlToList(url);
     }
   });
 };
 
-exports.isUrlArchived = function() {
+
+
+exports.addUrlToList = function(url) {
+  return new Promise((resolve, reject) => {
+    fs.appendFile(exports.paths.list, '\n' + url, err => {
+      if (err) {
+        reject(err);
+      }
+      console.log('added url ', url);
+      return returnWebData('loading.html');
+    });
+  });
 };
 
-exports.downloadUrls = function() {
+exports.isUrlArchived = function(url) {
+  return new Promise((resolve, reject) => {
+    fs.readdir(exports.paths.archivedSites, (err, files) => {
+      if (files.includes(url)) {
+        returnWebData(url);
+      } else {
+        returnWebData('loading.html');
+      }
+    });
+  });
 };
+
+exports.returnWebData = function(filePath) {
+  return new Promise((resolve, reject) => {
+    resolve('/' + filePath);
+
+
+  });
+  //download url
+    //resolve file path to url
+};
+
+exports.downloadUrls = function (urlArray) {
+
+};
+
+
+
+
+
+
+
+
+
+
+

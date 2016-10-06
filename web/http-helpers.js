@@ -11,7 +11,19 @@ exports.headers = {
 };
 
 exports.serveAssets = function(res, inputPath, callback) {
-  var thisPath = inputPath === '/' ? './web/public/index.html' : './web/public' + inputPath;
+  var thisPath;
+   // = inputPath === '/' ? './web/public/index.html' : './web/public' + inputPath;
+
+  if (inputPath === '/') {
+    thisPath = './web/public/index.html';
+  } else if (inputPath === '/styles.css') {
+    thisPath = './web/public/styles.css';
+  } else if (inputPath === '/loading.html') {
+    thisPath = './web/public/loading.html';
+  } else {
+    thisPath = './test/testdata/sites' + inputPath;
+  }
+
   fs.readFile(thisPath, function(err, data) {
     if (err) {
       res.writeHead(404, exports.headers);
@@ -25,7 +37,7 @@ exports.serveAssets = function(res, inputPath, callback) {
 
 
 exports.testyTest = function () {
-  console.log(archive.isUrlInList('www.example.com'));
+  console.log('testytest', archive.writeFile('example1.com'));
 };
 
 
