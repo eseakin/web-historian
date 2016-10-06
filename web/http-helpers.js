@@ -10,8 +10,8 @@ exports.headers = {
   'Content-Type': 'text/html'
 };
 
-exports.serveAssets = function(res, asset, callback) {
-  var thisPath = asset === '/' ? './web/public/index.html' : './web/public' + asset;
+exports.serveAssets = function(res, inputPath, callback) {
+  var thisPath = inputPath === '/' ? './web/public/index.html' : './web/public' + inputPath;
   fs.readFile(thisPath, function(err, data) {
     if (err) {
       res.writeHead(404, exports.headers);

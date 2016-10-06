@@ -12,6 +12,7 @@ exports.handleRequest = function (req, res) {
   if (req.method === 'GET') {
     helpers.testyTest();
     helpers.serveAssets(res, parsedUrl.pathname);
+
   } else if (req.method === 'POST') {
     var body = [];
     req.on('data', function(c) {
@@ -20,7 +21,11 @@ exports.handleRequest = function (req, res) {
       body = body.join('').split('=')[1];
       console.log('server posting ', body);
 
-      // fs.writeFile()
+      if (archive.isUrlInList(body)) {
+        //send back website data
+      } else {
+        
+      }
 
       res.writeHead(201, helpers.headers);
       res.end(JSON.stringify(body));

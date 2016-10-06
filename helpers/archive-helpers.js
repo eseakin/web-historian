@@ -28,6 +28,11 @@ exports.initialize = function(pathsObj) {
 exports.readListOfUrls = function(cb) {
   return new Promise((resolve, reject) => {
     fs.readFile(exports.paths.list, function(err, data) {
+      if (err) {
+        reject(err);
+      }
+
+      //returns each line as an item in an array
       resolve(data.toString().split('\n'));
     });
   });
@@ -40,13 +45,19 @@ exports.isUrlInList = function(url) {
     for (var i = 0; i < list.length; i++) {
       if (url === list[i]) {
         result = true;
+        break;
       }
     }
-
+    return result;
   });
 };
 
-exports.addUrlToList = function() {
+exports.addUrlToList = function(url) {
+  fs.appendFile(exports.paths.list, url, err => {
+    if (err) {
+      throw err;
+    }
+  });
 };
 
 exports.isUrlArchived = function() {
