@@ -21,10 +21,10 @@ exports.handleRequest = function (req, res) {
     req.on('end', function() {
       body = body.join('').split('=')[1];
 
-      archive.getUrlsToDownload().then( urlArray => {
-        console.log('downloading urls');
-        archive.downloadUrls(urlArray);
-      });
+      // archive.getUrlsToDownload().then( urlArray => {
+      //   console.log('downloading urls');
+      //   archive.downloadUrls(urlArray);
+      // });
 
      
       archive.isUrlInList(body).then( isInList => {

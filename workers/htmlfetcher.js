@@ -6,5 +6,6 @@ var request = require('request');
 var archive = require('../helpers/archive-helpers');
 
 archive.getUrlsToDownload().then( urlArray => {
+  console.log('downloading urls');
   exports.downloadUrls(urlArray);
 });
