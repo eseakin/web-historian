@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
+var request = require('request');
 
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
@@ -11,7 +12,7 @@ var _ = require('underscore');
 
 exports.paths = {
   siteAssets: path.join(__dirname, '../web/public'),
-  archivedSites: path.join(__dirname, '../archives/sites'),
+  archivedSites: path.join(__dirname, '../test/testdata/sites'),
   list: path.join(__dirname, '../test/testdata/sites.txt')
 };
 
@@ -25,13 +26,13 @@ exports.initialize = function(pathsObj) {
 // The following function names are provided to you to suggest how you might
 // modularize your code. Keep it clean!
 
-exports.readListOfUrls = function() {
+exports.readListOfUrls = function(pathName) {
+  var pathName = pathName || exports.paths.list;
   return new Promise((resolve, reject) => {
     fs.readFile(exports.paths.list, function(err, data) {
       if (err) {
         reject(err);
       }
-
       //returns each line as an item in an array
       resolve(data.toString().split('\n'));
     });
@@ -51,26 +52,17 @@ exports.isUrlInList = function(url) {
   });
 };
 
-exports.handlePost = function(url) {
-  return exports.isUrlInList(url).then( isInList => {
-    if (isInList) {
-      return isUrlArchived(url);
-    } else {
-      return addUrlToList(url);
-    }
-  });
-};
 
 
 
 exports.addUrlToList = function(url) {
+  console.log('addUrlToList', url);
   return new Promise((resolve, reject) => {
     fs.appendFile(exports.paths.list, '\n' + url, err => {
       if (err) {
         reject(err);
       }
-      console.log('added url ', url);
-      return returnWebData('loading.html');
+      resolve('loading.html');
     });
   });
 };
@@ -79,9 +71,9 @@ exports.isUrlArchived = function(url) {
   return new Promise((resolve, reject) => {
     fs.readdir(exports.paths.archivedSites, (err, files) => {
       if (files.includes(url)) {
-        returnWebData(url);
+        resolve(url);
       } else {
-        returnWebData('loading.html');
+        resolve('loading.html');
       }
     });
   });
@@ -90,15 +82,45 @@ exports.isUrlArchived = function(url) {
 exports.returnWebData = function(filePath) {
   return new Promise((resolve, reject) => {
     resolve('/' + filePath);
-
-
   });
-  //download url
-    //resolve file path to url
 };
 
-exports.downloadUrls = function (urlArray) {
+//for worker
+exports.getUrlsToDownload = function () {
+  return exports.readListOfUrls('/Users/student/Desktop/2016-09-web-historian/test/testdata/sites.txt')
+  .then(urls => {
+    return Promise.all(
+      urls.map((url) => {
+        return new Promise((resolve, reject) => {
+          fs.readdir(exports.paths.archivedSites, (err, files) => {
+            if (files.includes(url)) {
+              resolve(null);
+            } else {
+              resolve(url);
+            }
+          });
+        });
+      })
+    );
+  });
+};
 
+
+exports.downloadUrls = function (urlArray) {
+  urlArray.forEach(url => { 
+    console.log('downloadUrls working on ', url);
+
+    if (url === null) {
+      console.log('url is null, returning');
+      return;
+    }
+    request('http://' + url, function(error, response, data) {
+      if (error) {
+        throw error;
+      }
+      fs.writeFile('/Users/student/Desktop/2016-09-web-historian/test/testdata/sites/' + url, data);
+    });
+  });
 };
 
 

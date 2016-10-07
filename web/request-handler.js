@@ -17,13 +17,27 @@ exports.handleRequest = function (req, res) {
     var body = [];
     req.on('data', function(c) {
       body.push(c);
-    }).on('end', function() {
+    });
+    req.on('end', function() {
       body = body.join('').split('=')[1];
-      console.log('server posting ', body);
 
-      archive.handlePost(body).then( url => {
+      archive.getUrlsToDownload().then( urlArray => {
+        console.log('downloading urls');
+        archive.downloadUrls(urlArray);
+      });
+
+     
+      archive.isUrlInList(body).then( isInList => {
+        if (isInList) {
+          return archive.isUrlArchived(body);
+        } else {
+          return archive.addUrlToList(body);
+        }
+      }).then( newUrl => {
+        return archive.returnWebData(newUrl);
+      }).then( webDataReturn => {
         res.writeHead(201, helpers.headers);
-        helpers.serveAssets(res, url);
+        helpers.serveAssets(res, webDataReturn);
       });
     });
   }
